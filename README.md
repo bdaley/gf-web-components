@@ -10,7 +10,7 @@ use with online course content.
 
 The component(s) can be used independently from GameForm. You can manually embed into any web page by using the CDN URL for a specific component
 
-### Pub-Trivia Assessment 
+### Pub-Trivia Component 
 
 #### Step 1:
 Add the script to your web page:
