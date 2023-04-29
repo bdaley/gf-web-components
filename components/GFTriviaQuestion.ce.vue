@@ -19,7 +19,16 @@
     </div>
 
     <footer>
-      <small>A formative assessment courtesy of <a href="https://getgameform.com/" target="_blank">GameForm</a></small>
+      <section id="menu-container">
+        <div id="menu-icon">
+          <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><g data-name="Layer 2"><path d="M201.55 160h109.27v32.41A54.63 54.63 0 0 1 256.19 247h0a54.63 54.63 0 0 1-54.63-54.63V160h-.01ZM193.68 306.63h125.01V352H193.68z" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="20px" class="stroke-083b43"></path><path d="M238.13 244.28v17.9a44.45 44.45 0 0 1-44.45 44.45h0V352h125v-45.37h0a44.45 44.45 0 0 1-44.45-44.45v-17.9M310.82 170.77h20.92A25.28 25.28 0 0 1 357 196.05h0a25.28 25.28 0 0 1-25.28 25.28h-29.2M201.18 170.77h-20.92A25.28 25.28 0 0 0 155 196.05h0a25.28 25.28 0 0 0 25.28 25.28h29.2" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="20px" class="stroke-083b43"></path></g></svg>
+        </div>
+        <small>A formative assessment courtesy of <a href="https://getgameform.com/" target="_blank">GameForm</a></small>
+      </section>
+      <section id="leaderboard">
+        leader board<br>
+
+      </section>
     </footer>
 
     <div class="overlay" v-if="overlay">
@@ -261,9 +270,9 @@ button:hover {
 }
 .revealed::after{
   position: absolute;
-  left: 10px;
+  left: 20px;
   font-size: 2em;
-  top: 0px;
+  top: 15px;
 }
 
 /* ☒ */
@@ -273,19 +282,53 @@ button:hover {
 
 /* ☑ */
 .revealed.correct::after {
-  content: "\2611"; 
+  /* content: "\2611";  */
+  width: 40px;
+  content: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjAgMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEwIDBDNC41IDAgMCA0LjUgMCAxMHM0LjUgMTAgMTAgMTAgMTAtNC41IDEwLTEwUzE1LjUgMCAxMCAwWk04IDE1bC01LTUgMS40LTEuNEw4IDEyLjJsNy42LTcuNkwxNyA2bC05IDlaIiBmaWxsPSIjZmZmZmZmIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsYXNzPSJmaWxsLTAwMDAwMCI+PC9wYXRoPjwvc3ZnPg==")
 }
 
+#menu-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+#menu-icon {
+  width: 10%;
+  cursor: pointer;
+}
+
+footer > small {
+  width: 90%;
+}
 
 footer {
-  text-align: center;
+  position: absolute;
+
+  height: 80px;
+  /* text-align: right; */
   padding: var(--padding);
   background-color: var(--base-gray);
-  color: var(--footer-text)
+  color: var(--footer-text);
+  transition: all 1s;
+  left: 0px;
+  right: 0px;
+  bottom: -80px;
+  z-index: 0;
+
 }
+
+footer:hover {
+  height: 500px;
+}
+
 
 footer a, a:visited{
   color: var(--footer-text)
+}
+
+#leaderboard {
+  display:none
 }
 
 
