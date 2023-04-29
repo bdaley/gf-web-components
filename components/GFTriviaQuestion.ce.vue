@@ -11,7 +11,7 @@
         <button v-for="option in answersArrayShuffled" 
           :class="{ correct: option === answersArray[0], revealed }"
           :disabled="revealed"
-          @click="checkAnswer()"
+          @click="checkAnswer(option)"
           >
           {{ option }}
         </button>
@@ -34,6 +34,31 @@
 
 <script>
 import { shuffle } from 'underscore'
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getAuth, signInAnonymously } from "firebase/auth";
+
+
+
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyD8XNm6JuPn_JvB-mOkZYF1lntXl9JE0Ug',
+  authDomain: 'getgameform.web.app',
+  projectId: 'getgameform',
+  appId: '1:631880925853:web:443dea65019c7f380b4a74',
+  measurementId: "G-JSJEG57E3C"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Initialize Cloud Firestore and get a reference to the service
+const db = getFirestore(app);
+
+
+const auth = getAuth();
+
+
 
 export default {
   props: {
@@ -45,6 +70,10 @@ export default {
       type: Number,
       required: false,
       default: 30
+    },
+    dataId: {
+      type: String,
+      required: false
     }
   },
   data() {
@@ -55,7 +84,9 @@ export default {
       seconds: Number(this.time),
       timer: null,
       revealed: false,
-      overlay: true
+      overlay: true,
+      points: 0,
+      auth: false
 
     }
   },
@@ -77,12 +108,30 @@ export default {
       clearInterval(this.timer)
     },
 
-    checkAnswer(){
-      console.log('checking answer')
+    checkAnswer(chosen){
+      if(chosen === this.answersArray[0] && this.dataId && this.auth){
+        this.setScore()
+      }
       // Stop the timer
       this.timerStop()
       // Reveal answer and disable buttons
       this.revealed = true;
+    },
+    async setScore(){
+      this.points = 100 * this.seconds
+      try {
+        const docRef = await addDoc(collection(db, "scores"), {
+          assessment_id: this.dataId,
+          host: location.host,
+          path: location.pathname,
+          score: this.points,
+          uid: this.auth.currentUser.uid,
+          submitted: new Date()
+        });
+        console.log("Document written with ID: ", docRef.id);
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
     }
   },
 
@@ -90,13 +139,24 @@ export default {
     this.answersArray = this.answers.split(',')
     this.answersArrayShuffled = shuffle(this.answersArray)
     // this.timerStart()
+    // console.log(this.dataId)
+    signInAnonymously(auth)
+      .then(() => {
+        // Signed in..
+        console.log(auth)
+        this.auth = auth
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // ...
+      });
   }
 }
 </script>
 
 
 <style scoped>
-
 * {
   box-sizing: border-box
 }
@@ -105,16 +165,19 @@ a:link {
   color: var(--gf-blue)
 }
 div.trivia-container {
+
   --padding: 1em;
-  --base-gray: #eee;
-  --button-bg-color: rgb(230, 230, 230);
-  --button-text-color: rgb(82, 82, 82);
+  --base-gray: rgb(65, 65, 65);
+  --button-bg-color: rgb(173, 200, 237);
+  --button-text-color: rgb(41, 60, 112);
   --gf-blue: rgb(41, 60, 112);
-  background-color: white;
+  --footer-text: rgb(205, 205, 205);
+  background-color: rgb(222, 236, 255);
   width: 500px;
   max-width: 100%;
   font-family: Arial,Helvetica Neue,Helvetica,sans-serif; 
   position: relative;
+  
 
 }
 
@@ -178,20 +241,20 @@ button {
 }
 
 button:hover {
-  transition: background-color .5s;
+  /* transition: background-color .2s; */
   background-color: var(--gf-blue);
   color: rgb(187, 228, 250);
 }
 
 .revealed, .revealed:hover {
-  transition: all 1s;
+  transition: all .5s;
   opacity: .45;
   background-color: var(--button-bg-color);
   color: var(--button-text-color);
 }
 
 .revealed.correct, .revealed.correct:hover {
-  transition: all 1s;
+  transition: all .5s;
   opacity: 1;
   background-color: var(--gf-blue);
   color: white
@@ -218,7 +281,11 @@ footer {
   text-align: center;
   padding: var(--padding);
   background-color: var(--base-gray);
-  color: var(--button-text-color)
+  color: var(--footer-text)
+}
+
+footer a, a:visited{
+  color: var(--footer-text)
 }
 
 
