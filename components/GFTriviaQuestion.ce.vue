@@ -61,9 +61,8 @@
 import { shuffle, orderBy } from 'lodash'
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
-// import * as crypto from "crypto";
 import Toastify from 'toastify-js'
-import "toastify-js/src/toastify.css"
+// import "toastify-js/src/toastify.css"
 
 const firebaseConfig = {
   apiKey: 'AIzaSyD8XNm6JuPn_JvB-mOkZYF1lntXl9JE0Ug',
@@ -209,7 +208,9 @@ export default {
 </script>
 
 
-<style scoped>
+<style>
+@import url('https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css');
+
 * {
   box-sizing: border-box
 }
