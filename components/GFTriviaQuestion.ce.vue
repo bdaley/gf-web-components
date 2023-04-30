@@ -40,7 +40,7 @@
           </thead>
           <tbody>
             <tr v-for="(person, key) in leaders">
-              <td>{{ key+1 }}</td><td v-html="(person.uid==this.auth.currentUser.uid)?'You!':'Anonymous Player'"></td><td>{{ person.score }}</td>
+              <td>{{ key+1 }}</td><td v-html="(person.uid==this.getCurrentUser())?'You!':'Anonymous Player'"></td><td>{{ person.score }}</td>
             </tr>
           </tbody>
         </table>
@@ -61,7 +61,7 @@
 import { shuffle, orderBy } from 'lodash'
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
-import { getAuth, signInAnonymously } from "firebase/auth";
+// import * as crypto from "crypto";
 import Toastify from 'toastify-js'
 import "toastify-js/src/toastify.css"
 
@@ -78,9 +78,6 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
-
-
-const auth = getAuth();
 
 
 
@@ -137,7 +134,7 @@ export default {
     checkAnswer(chosen){
       let isCorrect = (chosen === this.answersArray[0]);
       
-      if(this.dataId && this.auth){
+      if(this.dataId){
         this.setScore(isCorrect ? 100 : 0)
       }
 
@@ -158,7 +155,7 @@ export default {
           host: location.host,
           path: location.pathname,
           score: this.points,
-          uid: this.auth.currentUser.uid,
+          uid: this.getCurrentUser(),
           submitted: new Date()
         });
         console.log("Document written with ID: ", docRef.id);
@@ -170,7 +167,14 @@ export default {
     async getLeaders(){
       let response = await fetch(`https://getgameform.com/api/leaderboard?id=${this.dataId}&host=${location.host}&path=${location.pathname}`)
       let leaders = await response.json()
-      this.leaders = orderBy(leaders, ['score', 'desc'])
+      this.leaders = orderBy(leaders, 'score', 'desc')
+    },
+    getCurrentUser(){
+      let key = 'game-form-user';
+      if(!localStorage.getItem(key)){
+        localStorage.setItem(key, self.crypto.randomUUID())
+      }
+      return localStorage.getItem(key)
     },
     toast(msg, clickFn=null ){
       // https://apvarun.github.io/toastify-js/#
@@ -196,18 +200,10 @@ export default {
     this.answersArrayShuffled = shuffle(this.answersArray)
     // this.timerStart()
     // console.log(this.dataId)
-    signInAnonymously(auth)
-      .then(() => {
-        // Signed in..
-        console.log(auth)
-        this.auth = auth
-        this.getLeaders()
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ...
-      });
+
+    // only sign in if not authenticated
+    this.getCurrentUser()
+
   }
 }
 </script>
@@ -375,7 +371,7 @@ footer.open {
 }
 
 
-footer a, a:visited{
+footer a:link, footer a:visited{
   color: var(--footer-text)
 }
 
